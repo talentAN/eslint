@@ -1,15 +1,16 @@
 {
-  "name": "eslint-prettier-cli",
+  "name": "cli",
   "version": "0.0.1",
   "description": "generate custom eslint and prettier config file for all repo",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "talentAN",
+  "author": "spe@sensorsdata.com",
   "license": "ISC",
   "dependencies": {
     "chalk": "^4.1.0",
-    "commander": "^7.1.0"
+    "commander": "^7.1.0",
+    "inquirer": "^8.0.0"
   }
 }

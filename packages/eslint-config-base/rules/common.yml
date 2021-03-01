@@ -1,0 +1,111 @@
+rules:
+  # ------------------------------------------------
+  # Best Practices
+  # 这些规则是关于最佳实践的，帮助你避免一些问题
+  # ------------------------------------------------
+
+  # 强制尽可能地使用点号
+  dot-notation:
+    - 2
+    - allowPattern: ^[a-z]+(_[a-z]+)+$
+  # 要求使用 === 和 !== airbnb-base
+  eqeqeq: 2
+  # 禁用 alert、confirm 和 prompt airbnb-base
+  no-alert: 2
+  # 禁止除法操作符显式的出现在正则表达式开始的位置 airbnb-base
+  no-div-regex: 2
+  # 要求或禁止 “Yoda” 条件
+  yoda:
+    - 2
+    - never
+    - onlyEquality: true
+
+  # ------------------------------------------------
+  # Best Practices
+  # 这些规则是关于最佳实践的，帮助你避免一些问题
+  # ------------------------------------------------
+
+  # 要求或禁止 var 声明中的初始化
+  init-declarations: 0
+  # default-case
+  default-case: 0
+  # 禁止变量声明与外层作用域的变量同名
+  no-shadow: 0
+  # 禁止使用特定的语法
+  no-restricted-syntax: 0
+  no-plusplus:
+    - 2
+    - allowForLoopAfterthoughts: true
+
+  # ------------------------------------------------
+  # Stylistic Issues
+  # 这些规则是关于风格指南的，而且是非常主观的：
+  # ------------------------------------------------
+
+  # 在数组开括号后和闭括号前强制换行
+  array-bracket-newline:
+    - 2
+    - consistent
+  # 强制数组元素间出现换行
+  array-element-newline:
+    - 2
+    - consistent
+  # 强制使用骆驼拼写法命名约定
+  camelcase: 0
+  # 强制一致地使用 function 声明或表达式
+  func-style:
+    - 2
+    - declaration
+    - allowArrowFunctions: true
+  # 强制在 JSX 属性中一致地使用双引号或单引号
+  jsx-quotes: 2
+  # 强制一行的最大长度
+  max-len:
+    - 2
+    - code: 120
+      ignoreStrings: true
+      ignoreTemplateLiterals: true
+  # 禁用按位运算符
+  no-bitwise: 0
+  # 要求或禁止在语句间填充空行
+  padding-line-between-statements: 2
+  prefer-const:
+    - 2
+    - destructuring: all
+  # error; 必须使用单引号
+  quotes:
+    - 2
+    - single
+    - avoidEscape: true
+      allowTemplateLiterals: true
+
+  # ------------------------------------------------
+  # ECMAScript 6
+  # 这些规则只与 ES6 有关 即通常所说的 ES2015：
+  # ------------------------------------------------
+
+  # 禁止重复模块导入
+  no-duplicate-imports: 2
+  valid-jsdoc:
+    - 1
+    - requireReturn: false
+
+  require-jsdoc:
+    - 1
+    - require:
+        FunctionDeclaration: true
+        MethodDefinition: true
+        ClassDeclaration: false
+        ArrowFunctionExpression: false
+        FunctionExpression: true
+
+  global-require: 0
+  comma-dangle:
+    - 2
+    - only-multiline
+  prefer-destructuring: 0
+  consistent-return: 0
+  import/prefer-default-export: 0
+  prefer-spread: 0
+  generator-star-spacing: 0
+  no-underscore-dangle: 2

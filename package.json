@@ -1,5 +1,5 @@
 {
-  "name": "root",
+  "name": "eslint-init",
   "private": true,
   "devDependencies": {
     "lerna": "^3.22.1"

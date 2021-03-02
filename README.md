@@ -2,7 +2,10 @@
 
 ### eslint-cli
 
-init:
+使用方式：
+
+- format init
+- 安装 prettier 插件
 
 执行：
 
@@ -16,3 +19,5 @@ init:
     - 根据 eslint 生成 prettier
 
 思考： 要不要添加一些 hooks 之类的
+
+TODO: 要不要删除一些依赖？

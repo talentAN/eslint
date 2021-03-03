@@ -6,24 +6,25 @@
  */
 
 const { FRAME } = require('../consts');
+const { addDevDependencies, addSingle } = require('../utils/process');
 // 添加TS相关配置
 const _addTsConfig = (config, ret) => {
-  ret.extends.push('plugin:@typescript-eslint/recommended');
   ret.plugins.push('@typescript-eslint');
+  ret.extends.push('@sc/eslint-config-sensorsdata-typescript');
+  addDevDependencies('@typescript-eslint/eslint-plugin');
 };
 
 // 添加框架(React | VueJS)相关配置
 const _addFrameConfig = (config, ret) => {
-  const { useTS, frame } = config;
+  const { frame } = config;
   if (frame === FRAME.React) {
-    ret.plugins.push('react');
-    useTS
-      ? ret.extends.push('')
-      : ret.extends.push(
-          'eslint-config-airbnb/rules/react',
-          'eslint-config-airbnb/rules/react-a11y',
-          'eslint-config-airbnb/rules/react-hooks'
-        );
+    ret.extends.push('@sc/eslint-config-sensorsdata-react');
+    process.argv.BABEL_CONFIG.presets = process.argv.BABEL_CONFIG.presets;
+    const babelPresets = ['@babel/preset-react'];
+    const babelPlugins = ['@babel/plugin-proposal-class-properties'];
+    babelPresets.forEach(p => addSingle(p, process.argv.BABEL_CONFIG.presets));
+    babelPlugins.forEach(p => addSingle(p, process.argv.BABEL_CONFIG.plugins));
+    addDevDependencies([...babelPresets, ...babelPlugins]);
   }
   if (frame === FRAME.VueJS) {
     // TODO:
@@ -32,38 +33,46 @@ const _addFrameConfig = (config, ret) => {
 
 // 添加用于覆盖eslint规则的prettier规则
 const _addPrettierConfig = (config, ret) => {
-  ret.extends.push('prettier', 'prettier/babel', 'plugin:prettier/recommended');
+  ret.extends.push('prettier');
+  addDevDependencies(['eslint-config-prettier', 'eslint-plugin-prettier']);
   const { useTS, frame } = config;
   if (useTS) {
     ret.extends.push('prettier/@typescript-eslint');
   }
   if (frame === FRAME.React) {
-    ret.extends.push('prettier/react');
   }
   if (frame === FRAME.VueJS) {
-    ret.extends.push('prettier/vue');
   }
 };
 
 // 生成 .eslintrc.js
 const parseConfig = config => {
   const { useTS } = config;
+  const parser = useTS ? '@typescript-eslint/parser ' : '@babel/eslint-parser';
+  addDevDependencies(['eslint', parser]);
   const ret = {
-    extends: ['@spe/eslint-config-base'],
+    extends: ['@sc/eslint-config-sensorsdata'],
     plugins: [],
-    parser: useTS ? '@typescript-eslint/parser ' : '@babel/eslint-parser',
+    parser,
     env: {
       browser: true,
       es6: true,
-      node: true,
+      node: true
     },
     parserOptions: {
       sourceType: 'module',
+      ecmaVersion: 6,
+      env: { es6: true },
       allowImportExportEverywhere: false,
       ecmaFeatures: {
         globalReturn: false,
+        jsx: true
       },
-    },
+      babelOptions: {
+        // parser用了babel的，所以要读取babel配置信息
+        configFile: './babel.config.js'
+      }
+    }
   };
   if (useTS) {
     _addTsConfig(config, ret);
@@ -76,5 +85,5 @@ const parseConfig = config => {
 };
 
 module.exports = {
-  parseConfig,
+  parseConfig
 };

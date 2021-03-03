@@ -3,18 +3,39 @@
 const { Command } = require('commander');
 const inquirer = require('inquirer');
 const process = require('process');
+const prettier = require('prettier');
 const fs = require('fs');
 const path = require('path');
 const { FRAME } = require('./consts');
-const { parseConfig } = require('./utils');
+const { parseRepoConfig } = require('./utils');
 const { print } = require('./utils/print');
-const { initBabelConfig } = require('./utils/fs');
+const { initContext } = require('./utils/fs');
+const { reduceArr } = require('./utils/process');
 
 // utils
 const _getPackageJson = folder => {
   const path_package = path.resolve(folder, 'package.json');
   const content = fs.readFileSync(path_package, { encoding: 'utf8' });
   return JSON.parse(content);
+};
+
+// add husky and link-stage
+const _addPreCommit = package => {
+  process.argv.DEPENDENCIES.push('lint-staged', 'husky');
+  // 设置link-stage
+  const lintStagedKey = process.argv.REPO_CONFIG.useTS
+    ? 'src/**/*.{js,jsx,ts,tsx}'
+    : 'src/**/*.{js,jsx}';
+  package['lint-staged'] = {
+    [lintStagedKey]: 'eslint'
+  };
+  package.scripts = package.scripts || {};
+  package.scripts.lint = `eslint --ext .js src && stylelint \"src/**/*.{css,less}\"`;
+  package.husky = {
+    hooks: {
+      'pre-commit': 'lint-staged'
+    }
+  };
 };
 
 // 确定项目配置
@@ -26,7 +47,7 @@ const _genModuleConfig = async () => {
     default: false,
     message: print.warn('Will you use TypeScript in this repo?')
   });
-  process.argv.CONFIG.useTS = useTS;
+  process.argv.REPO_CONFIG.useTS = useTS;
   // 选择框架
   const { frame } = await inquirer.prompt({
     type: 'list',
@@ -44,7 +65,7 @@ const _genModuleConfig = async () => {
     ],
     message: print.warn('Which frame will you use?')
   });
-  process.argv.CONFIG.frame = frame;
+  process.argv.REPO_CONFIG.frame = frame;
 };
 
 // 删除已存在的eslint, prettier配置文件
@@ -60,17 +81,18 @@ const _deleteExistedConfigFile = folder => {
 
 // 写入新的配置文件(eslint, prettier, babel)
 const _genConfigFile = folder => {
-  const { CONFIG = {} } = process.argv;
-  const content = `module.exports = ${JSON.stringify(parseConfig(CONFIG))}`;
+  const { REPO_CONFIG = {} } = process.argv;
+  const content = `module.exports = ${JSON.stringify(parseRepoConfig(REPO_CONFIG))}`;
   // 生成.eslintrc.js
-  fs.writeFileSync(path.resolve(folder, '.eslintrc.js'), content);
+  fs.writeFileSync(path.resolve(folder, '.eslintrc.js'), prettier.format(content));
   print.info('success to add .eslintrc.js ');
   // 生成.prettierrc
   fs.writeFileSync(
     path.resolve(folder, '.prettierrc'),
-    `{
-    "arrowParens": "avoid",
-    "printWidth": 100,
+    prettier.format(
+      `{
+    "arrowParens": "avoid", 
+    "printWidth": 100, 
     "tabWidth": 2,
     "useTabs": false,
     "semi": true,
@@ -78,65 +100,58 @@ const _genConfigFile = folder => {
     "trailingComma": "es5",
     "bracketSpacing": true
   }
-  `
+  `,
+      { parser: 'json' }
+    )
   );
   print.info('success to add .prettierrc');
   // 生成babel.config.js
-  //TODO: 去重
   fs.writeFileSync(
     path.resolve(folder, 'babel.config.js'),
-    `module.exports = ${JSON.stringify(process.argv.BABEL_CONFIG)}`
+    prettier.format(`module.exports = ${JSON.stringify(process.argv.BABEL_CONFIG)}`)
   );
   print.info('success to update babel.config.js');
 };
 
-// add lint-stage and preCommit in package.json
+// 修改package.json
 const _modifyPackageJson = folder => {
   const package = _getPackageJson(folder);
-  // 添加dev依赖
   package.devDependencies = package.devDependencies || {};
-  const { DEPENDENCIES = [] } = process.argv;
-  DEPENDENCIES.push('lint-staged', 'husky');
-  DEPENDENCIES.forEach(dep => (package.devDependencies[dep] = 'latest'));
-  // 设置link-stage
-  const lintStagedKey = process.argv.CONFIG.useTS
-    ? 'src/**/*.{js,jsx,ts,tsx}'
-    : 'src/**/*.{js,jsx}';
-  package['lint-staged'] = {
-    [lintStagedKey]: 'eslint'
-  };
-  package.scripts = package.scripts || {};
-  package.scripts.lint = `eslint --ext .js src && stylelint \"src/**/*.{css,less}\"`;
-  package.husky = {
-    hooks: {
-      'pre-commit': 'lint-staged'
-    }
-  };
-
-  fs.writeFileSync(path.resolve(folder, 'package.json'), JSON.stringify(package));
+  // add husky and link-stage
+  _addPreCommit(package);
+  // 添加dev依赖
+  const { DEPENDENCIES, BABEL_CONFIG, ESLINT_CONFIG } = process.argv;
+  reduceArr([
+    ...DEPENDENCIES,
+    ...BABEL_CONFIG.presets,
+    ...BABEL_CONFIG.plugins,
+    ...ESLINT_CONFIG.extends,
+    ...ESLINT_CONFIG.plugins
+  ]).forEach(dep => (package.devDependencies[dep] = 'latest'));
+  fs.writeFileSync(
+    path.resolve(folder, 'package.json'),
+    prettier.format(JSON.stringify(package), {
+      parser: 'json'
+    })
+  );
   print.info('success to add lint-stage in package.json');
 };
 
 // 初始化
 const init = async folder => {
-  try {
-    folder = path.resolve(__dirname, folder);
-    // 初始化需要的配置信息
-    process.argv.CONFIG = process.argv.CONFIG || {};
-    process.argv.DEPENDENCIES = process.argv.DEPENDENCIES || [];
-    initBabelConfig(folder);
-    // 1. 判断业务选择，确定引入内容
-    await _genModuleConfig();
-    // 2. 删除已存在的eslint, prettier配置文件
-    _deleteExistedConfigFile(folder);
-    // 3. 写入新的配置文件
-    _genConfigFile(folder);
-    // 4. 添加lint-state and preCommit command, 添加devDependence依赖
-    _modifyPackageJson(folder);
-    print.success("everything's done, run npm install and enjoy coding with eslint && prettier! ");
-  } catch (error) {
-    console.error(error);
-  }
+  folder = path.resolve(__dirname, folder);
+  // 初始化相关context
+  initContext(folder);
+  // 1. 判断业务选择，确定引入内容
+  await _genModuleConfig();
+  // 2. 删除已存在的eslint, prettier配置文件
+  _deleteExistedConfigFile(folder);
+  // 3. 写入新的配置文件
+  _genConfigFile(folder);
+  // 4. 添加lint-state and preCommit command, 添加devDependence依赖
+  _modifyPackageJson(folder);
+  // 5. 格式化已生成的.eslintrc.js, .prettierrc, babel.config.js
+  print.success("everything's done, run npm install and enjoy coding with eslint && prettier! ");
 };
 
 const program = new Command().arguments('[folder]').action(async (folder = '.') => {
@@ -144,7 +159,7 @@ const program = new Command().arguments('[folder]').action(async (folder = '.') 
     type: 'confirm',
     name: 'continue',
     default: true,
-    message: print.warn('We will replace your exit .eslintrc.* and .prettierrc')
+    message: print.warn('We will replace your exited .eslintrc.* and .prettierrc.')
   });
   if (!goOn) {
     return;

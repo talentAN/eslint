@@ -1,0 +1,11 @@
+{
+  "name": "@spe/eslint-config-ts",
+  "version": "0.0.0",
+  "description": "ts配置",
+  "author": "spe@sensorsdata.com",
+  "license": "ISC",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: run tests from root\" && exit 1"
+  }
+}

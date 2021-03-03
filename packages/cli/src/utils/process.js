@@ -10,14 +10,9 @@ const addDevDependencies = dep => {
   }
 };
 
-// 去重添加配置
-const addSingle = (name, targets) => {
-  if (targets.indexOf(name) === -1) {
-    targets.push(name);
-  }
-};
-
+// 去重
+const reduceArr = arr => Array.from(new Set(arr));
 module.exports = {
   addDevDependencies,
-  addSingle
+  reduceArr
 };

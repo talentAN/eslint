@@ -1,5 +1,5 @@
 {
-  "name": "cli",
+  "name": "@spe/eslint-cli",
   "version": "0.0.1",
   "description": "generate custom eslint and prettier config file for all repo",
   "main": "index.js",
@@ -9,16 +9,9 @@
   "author": "spe@sensorsdata.com",
   "license": "ISC",
   "dependencies": {
-    "@babel/core": "^7.13.8",
-    "@babel/eslint-parser": "^7.13.8",
-    "@typescript-eslint/eslint-plugin": "^4.16.1",
-    "@typescript-eslint/parser": "^4.16.1",
-    "babel-eslint": "^10.1.0",
+    "@spe/eslint-config-react": "^0.1.0",
     "chalk": "^4.1.0",
     "commander": "^7.1.0",
-    "eslint": "^7.21.0",
-    "eslint-config-prettier": "^8.1.0",
-    "eslint-plugin-prettier": "^3.3.1",
     "inquirer": "^8.0.0",
     "prettier": "^2.2.1"
   }

@@ -10,19 +10,21 @@ const { eslint: eslintTs } = require('@spe/eslint-config-ts');
 const { FRAME } = require('../consts');
 const { addDevDependencies, reduceArr } = require('../utils/process');
 // 添加TS相关配置
-const _addTsConfig = (config, ret) => {
-  ret.plugins.push(...eslintTs.plugins);
-  ret.extends.push(...eslintTs.extends);
+const _addTsConfig = () => {
+  process.argv.ESLINT_CONFIG.extends.push();
+  process.argv.ESLINT_CONFIG.plugins.push('@typescript-eslint');
 };
 
 // 添加框架(React | VueJS)相关配置
 const _addFrameConfig = (config, ret) => {
   const { frame } = config;
   if (frame === FRAME.React) {
+    // 添加babel所需配置
+    process.argv.BABEL_CONFIG.presets.push('@babel/preset-react');
+    process.argv.BABEL_CONFIG.plugins.push('@babel/plugin-proposal-class-properties');
+
     ret.extends.push(...eslintReact.extends);
     ret.plugins.push(...eslintReact.plugins);
-    process.argv.BABEL_CONFIG.presets.push(...babelReact.presets);
-    process.argv.BABEL_CONFIG.plugins.push(...babelReact.plugins);
   }
   if (frame === FRAME.VueJS) {
     // TODO:
@@ -45,11 +47,11 @@ const _addPrettierConfig = (config, ret) => {
 
 // 生成 .eslintrc.js
 const parseRepoConfig = config => {
-  const { useTS } = config;
+  const { useTS } = process.argv.REPO_CONFIG;
   const parser = useTS ? '@typescript-eslint/parser ' : '@babel/eslint-parser';
   addDevDependencies(['eslint', parser]);
-  const ret = {
-    extends: ['@sc/eslint-config-sensorsdata'],
+  process.argv.ESLINT_CONFIG = {
+    extends: [],
     plugins: [],
     parser,
     env: {
@@ -73,7 +75,7 @@ const parseRepoConfig = config => {
     }
   };
   if (useTS) {
-    _addTsConfig(config, ret);
+    _addTsConfig();
   }
   _addFrameConfig(config, ret);
   // 添加prettier配置

@@ -6,10 +6,10 @@ const process = require('process');
 const prettier = require('prettier');
 const fs = require('fs');
 const path = require('path');
-const { FRAME } = require('./consts');
+const { FRAME, PRETTIER_CONFIG } = require('./consts');
 const { parseRepoConfig } = require('./utils');
 const { print } = require('./utils/print');
-const { initContext } = require('./utils/fs');
+const { initContext, writeJson } = require('./utils/fs');
 const { reduceArr } = require('./utils/process');
 
 // utils
@@ -81,29 +81,12 @@ const _deleteExistedConfigFile = folder => {
 
 // 写入新的配置文件(eslint, prettier, babel)
 const _genConfigFile = folder => {
-  const { REPO_CONFIG = {} } = process.argv;
-  const content = `module.exports = ${JSON.stringify(parseRepoConfig(REPO_CONFIG))}`;
+  const content = `module.exports = ${JSON.stringify(parseRepoConfig())}`;
   // 生成.eslintrc.js
   fs.writeFileSync(path.resolve(folder, '.eslintrc.js'), prettier.format(content));
   print.info('success to add .eslintrc.js ');
   // 生成.prettierrc
-  fs.writeFileSync(
-    path.resolve(folder, '.prettierrc'),
-    prettier.format(
-      `{
-    "arrowParens": "avoid", 
-    "printWidth": 100, 
-    "tabWidth": 2,
-    "useTabs": false,
-    "semi": true,
-    "singleQuote": true,
-    "trailingComma": "es5",
-    "bracketSpacing": true
-  }
-  `,
-      { parser: 'json' }
-    )
-  );
+  writeJson(path.resolve(folder, '.prettierrc'), PRETTIER_CONFIG);
   print.info('success to add .prettierrc');
   // 生成babel.config.js
   fs.writeFileSync(
@@ -119,7 +102,7 @@ const _modifyPackageJson = folder => {
   package.devDependencies = package.devDependencies || {};
   // add husky and link-stage
   _addPreCommit(package);
-  // 添加dev依赖
+  // add devDependencies
   const { DEPENDENCIES, BABEL_CONFIG, ESLINT_CONFIG } = process.argv;
   reduceArr([
     ...DEPENDENCIES,
@@ -128,12 +111,7 @@ const _modifyPackageJson = folder => {
     ...ESLINT_CONFIG.extends,
     ...ESLINT_CONFIG.plugins
   ]).forEach(dep => (package.devDependencies[dep] = 'latest'));
-  fs.writeFileSync(
-    path.resolve(folder, 'package.json'),
-    prettier.format(JSON.stringify(package), {
-      parser: 'json'
-    })
-  );
+  writeJson(path.resolve(folder, 'package.json'), package);
   print.info('success to add lint-stage in package.json');
 };
 

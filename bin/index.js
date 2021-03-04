@@ -6,7 +6,7 @@ const packageJson = require('../package.json');
 const chalk = require('chalk');
 
 console.log(
-  chalk.hex('#00BF8A')('-= eslint-prettier-cli =-'),
+  chalk.hex('#00BF8A')('-= sensors-eslint-cli =-'),
   chalk.hex('#307EF2')('v' + packageJson.version)
 );
 

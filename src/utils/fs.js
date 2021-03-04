@@ -2,10 +2,11 @@
 
 const fs = require('fs');
 const path = require('path');
+const prettier = require('prettier');
 
 // 初始化全局依赖的context
 const initContext = folder => {
-  // 用户输入配置
+  // 用户输入的项目配置
   process.argv.REPO_CONFIG = process.argv.REPO_CONFIG || {};
   // eslint配置信息
   process.argv.ESLINT_CONFIG = process.argv.ESLINT_CONFIG || {};
@@ -20,6 +21,10 @@ const initContext = folder => {
   process.argv.DEPENDENCIES = process.argv.DEPENDENCIES || [];
 };
 
+const writeJson = (path, content) =>
+  fs.writeFileSync(path, prettier.format(JSON.stringify(content)), { parser: 'json' });
+
 module.exports = {
-  initContext
+  initContext,
+  writeJson
 };

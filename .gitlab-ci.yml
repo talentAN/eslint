@@ -1,0 +1,19 @@
+# @format
+
+image: node
+
+variables:
+
+stages:
+  - publish_to_npm
+
+# 发布到npm
+publish_to_npm:
+  stage: publish_to_npm
+  only:
+    - tags
+  when: manual
+  script:
+    - echo "=====start publish======"
+    - node scripts/publish.js
+    - echo "====publish success!===="

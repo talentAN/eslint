@@ -4,13 +4,12 @@
  *  plugin 则提供了除预设之外的自定义规则，当你在 eslint 的规则里找不到合适的的时候就可以借用插件来实现了
  * @format
  */
-const { reactEslint } = require('../config/frame/react');
-const { basicEslint } = require('../config/basic');
-const { tsEslint } = require('../config/ts');
+const reactEslint = require('../config/frame/react');
+const basicEslint = require('../config/basic');
+const tsEslint = require('../config/ts');
 
 const { FRAME } = require('../consts');
 const { addDevDependencies, reduceArr } = require('../utils/process');
-const react = require('../config/frame/react');
 // 添加TS相关配置
 const _addTsConfig = () => {
   process.argv.ESLINT_CONFIG.extends.push(...tsEslint.extends);

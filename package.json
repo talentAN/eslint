@@ -9,7 +9,6 @@
   "author": "spe@sensorsdata.com",
   "license": "ISC",
   "dependencies": {
-    "@spe/eslint-config-react": "^0.1.0",
     "chalk": "^4.1.0",
     "commander": "^7.1.0",
     "inquirer": "^8.0.0",

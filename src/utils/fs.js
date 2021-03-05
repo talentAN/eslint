@@ -22,7 +22,7 @@ const initContext = folder => {
 };
 
 const writeJson = (path, content) =>
-  fs.writeFileSync(path, prettier.format(JSON.stringify(content)), { parser: 'json' });
+  fs.writeFileSync(path, prettier.format(JSON.stringify(content), { parser: 'json' }));
 
 module.exports = {
   initContext,

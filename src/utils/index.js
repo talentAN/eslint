@@ -4,27 +4,34 @@
  *  plugin 则提供了除预设之外的自定义规则，当你在 eslint 的规则里找不到合适的的时候就可以借用插件来实现了
  * @format
  */
-const { eslint: eslintReact, babel: babelReact } = require('@spe/eslint-config-react');
-const { eslint: eslintTs } = require('@spe/eslint-config-ts');
+const { reactEslint } = require('../config/frame/react');
+const { basicEslint } = require('../config/basic');
+const { tsEslint } = require('../config/ts');
 
 const { FRAME } = require('../consts');
 const { addDevDependencies, reduceArr } = require('../utils/process');
+const react = require('../config/frame/react');
 // 添加TS相关配置
 const _addTsConfig = () => {
-  process.argv.ESLINT_CONFIG.extends.push();
-  process.argv.ESLINT_CONFIG.plugins.push('@typescript-eslint');
+  process.argv.ESLINT_CONFIG.extends.push(...tsEslint.extends);
+  process.argv.ESLINT_CONFIG.plugins.push(...tsEslint.plugins);
+  addDevDependencies(...tsEslint.dependencies);
 };
 
 // 添加框架(React | VueJS)相关配置
-const _addFrameConfig = (config, ret) => {
-  const { frame } = config;
+const _addFrameConfig = () => {
+  const { frame } = process.argv.REPO_CONFIG;
   if (frame === FRAME.React) {
     // 添加babel所需配置
     process.argv.BABEL_CONFIG.presets.push('@babel/preset-react');
     process.argv.BABEL_CONFIG.plugins.push('@babel/plugin-proposal-class-properties');
-
-    ret.extends.push(...eslintReact.extends);
-    ret.plugins.push(...eslintReact.plugins);
+    process.argv.ESLINT_CONFIG.extends.push(...reactEslint.extends);
+    process.argv.ESLINT_CONFIG.plugins.push(...reactEslint.plugins);
+    addDevDependencies(
+      '@babel/preset-react',
+      '@babel/plugin-proposal-class-properties',
+      ...reactEslint.dependencies
+    );
   }
   if (frame === FRAME.VueJS) {
     // TODO:
@@ -32,27 +39,24 @@ const _addFrameConfig = (config, ret) => {
 };
 
 // 添加用于覆盖eslint规则的prettier规则
-const _addPrettierConfig = (config, ret) => {
-  ret.extends.push('prettier');
-  addDevDependencies(['eslint-config-prettier', 'eslint-plugin-prettier']);
-  const { useTS, frame } = config;
+const _addPrettierConfig = () => {
+  process.argv.ESLINT_CONFIG.extends.push('prettier');
+  addDevDependencies(['prettier', 'eslint-config-prettier', 'eslint-plugin-prettier']);
+  const { useTS } = process.argv.REPO_CONFIG;
   if (useTS) {
-    ret.extends.push('prettier/@typescript-eslint');
-  }
-  if (frame === FRAME.React) {
-  }
-  if (frame === FRAME.VueJS) {
+    process.argv.ESLINT_CONFIG.extends.push('prettier/@typescript-eslint');
+    addDevDependencies('prettier/@typescript-eslint');
   }
 };
 
 // 生成 .eslintrc.js
-const parseRepoConfig = config => {
+const parseRepoConfig = () => {
   const { useTS } = process.argv.REPO_CONFIG;
   const parser = useTS ? '@typescript-eslint/parser ' : '@babel/eslint-parser';
-  addDevDependencies(['eslint', parser]);
+  addDevDependencies('eslint', parser, ...basicEslint.dependencies);
   process.argv.ESLINT_CONFIG = {
-    extends: [],
-    plugins: [],
+    extends: [...basicEslint.extends],
+    plugins: [...basicEslint.plugins],
     parser,
     env: {
       browser: true,
@@ -77,13 +81,11 @@ const parseRepoConfig = config => {
   if (useTS) {
     _addTsConfig();
   }
-  _addFrameConfig(config, ret);
+  _addFrameConfig();
   // 添加prettier配置
-  _addPrettierConfig(config, ret);
-  ret.extends = reduceArr(ret.extends);
-  ret.plugins = reduceArr(ret.plugins);
-  process.argv.ESLINT_CONFIG = ret;
-  return ret;
+  _addPrettierConfig();
+  process.argv.ESLINT_CONFIG.extends = reduceArr(process.argv.ESLINT_CONFIG.extends);
+  process.argv.ESLINT_CONFIG.plugins = reduceArr(process.argv.ESLINT_CONFIG.plugins);
 };
 
 module.exports = {

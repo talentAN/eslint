@@ -81,7 +81,8 @@ const _deleteExistedConfigFile = folder => {
 
 // 写入新的配置文件(eslint, prettier, babel)
 const _genConfigFile = folder => {
-  const content = `module.exports = ${JSON.stringify(parseRepoConfig())}`;
+  parseRepoConfig();
+  const content = `module.exports = ${JSON.stringify(process.argv.ESLINT_CONFIG)}`;
   // 生成.eslintrc.js
   fs.writeFileSync(path.resolve(folder, '.eslintrc.js'), prettier.format(content));
   print.info('success to add .eslintrc.js ');
@@ -103,14 +104,8 @@ const _modifyPackageJson = folder => {
   // add husky and link-stage
   _addPreCommit(package);
   // add devDependencies
-  const { DEPENDENCIES, BABEL_CONFIG, ESLINT_CONFIG } = process.argv;
-  reduceArr([
-    ...DEPENDENCIES,
-    ...BABEL_CONFIG.presets,
-    ...BABEL_CONFIG.plugins,
-    ...ESLINT_CONFIG.extends,
-    ...ESLINT_CONFIG.plugins
-  ]).forEach(dep => (package.devDependencies[dep] = 'latest'));
+  const { DEPENDENCIES } = process.argv;
+  reduceArr(DEPENDENCIES).forEach(dep => (package.devDependencies[dep] = 'latest'));
   writeJson(path.resolve(folder, 'package.json'), package);
   print.info('success to add lint-stage in package.json');
 };

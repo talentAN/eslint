@@ -39,8 +39,12 @@ const _addFrameConfig = () => {
 
 // 添加用于覆盖eslint规则的prettier规则
 const _addPrettierConfig = () => {
+  // 基础规则最后放入，免得某些傻叉包又开启了禁用的规则
+  process.argv.ESLINT_CONFIG.extends.push(...basicEslint.extends);
+  process.argv.ESLINT_CONFIG.plugins.push(...basicEslint.plugins);
+  // 设置prettier
   process.argv.ESLINT_CONFIG.extends.push('prettier');
-  addDevDependencies(['prettier', 'eslint-config-prettier', 'eslint-plugin-prettier']);
+  addDevDependencies('prettier', 'eslint-config-prettier', 'eslint-plugin-prettier');
   const { useTS } = process.argv.REPO_CONFIG;
   if (useTS) {
     process.argv.ESLINT_CONFIG.extends.push('prettier/@typescript-eslint');
@@ -54,8 +58,8 @@ const parseRepoConfig = () => {
   const parser = useTS ? '@typescript-eslint/parser ' : '@babel/eslint-parser';
   addDevDependencies('eslint', parser, ...basicEslint.dependencies);
   process.argv.ESLINT_CONFIG = {
-    extends: [...basicEslint.extends],
-    plugins: [...basicEslint.plugins],
+    extends: [],
+    plugins: [],
     parser,
     env: {
       browser: true,

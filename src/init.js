@@ -90,6 +90,8 @@ const _genConfigFile = folder => {
   writeJson(path.resolve(folder, '.prettierrc'), PRETTIER_CONFIG);
   print.info('success to add .prettierrc');
   // 生成babel.config.js
+  process.argv.BABEL_CONFIG.presets = reduceArr(process.argv.BABEL_CONFIG.presets);
+  process.argv.BABEL_CONFIG.plugins = reduceArr(process.argv.BABEL_CONFIG.plugins);
   fs.writeFileSync(
     path.resolve(folder, 'babel.config.js'),
     prettier.format(`module.exports = ${JSON.stringify(process.argv.BABEL_CONFIG)}`)

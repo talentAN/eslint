@@ -1,19 +1,13 @@
 # @format
 
-image: node
-
-variables:
-
 stages:
   - publish_to_npm
 
-# 发布到npm
+# 人工确认发布到npm
 publish_to_npm:
   stage: publish_to_npm
   only:
-    - tags
+    - master
   when: manual
   script:
-    - echo "=====start publish======"
-    - node scripts/publish.js
-    - echo "====publish success!===="
+    - /bin/bash ./scripts/publish_to_npm.sh

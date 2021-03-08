@@ -1,6 +1,6 @@
 {
   "name": "@talentan/eslint-prettier-cli",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "generate custom eslint and prettier config file for all repo",
   "main": "index.js",
   "bin": {

@@ -1,7 +1,47 @@
 {
-  "name": "root",
-  "private": true,
+  "name": "@talentan/eslint-prettier-cli",
+  "version": "0.2.0",
+  "description": "generate custom eslint and prettier config file for all repo",
+  "main": "index.js",
+  "bin": {
+    "eslint-cli": "./bin/index.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint --ext .js src && stylelint \"src/**/*.{css,less}\""
+  },
+  "author": "adam_an02@163.com",
+  "license": "MIT",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  },
+  "dependencies": {
+    "chalk": "^4.1.0",
+    "commander": "^7.1.0",
+    "inquirer": "^8.0.0",
+    "prettier": "^2.2.1"
+  },
   "devDependencies": {
-    "lerna": "^3.22.1"
+    "eslint": "latest",
+    "@typescript-eslint/parser": "latest",
+    "@sc/eslint-config-sensorsdata": "latest",
+    "@sc/eslint-config-sensorsdata-typescript": "latest",
+    "@typescript-eslint/eslint-plugin": "latest",
+    "@babel/preset-react": "latest",
+    "@babel/plugin-proposal-class-properties": "latest",
+    "@sc/eslint-config-sensorsdata-react": "latest",
+    "prettier": "latest",
+    "eslint-config-prettier": "latest",
+    "eslint-plugin-prettier": "latest",
+    "lint-staged": "latest",
+    "husky": "latest"
+  },
+  "lint-staged": {
+    "src/**/*.{js,jsx,ts,tsx}": "eslint"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
   }
 }

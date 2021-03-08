@@ -1,8 +1,8 @@
 #!/bin/bash
 
 npx npm-cli-login
-cd packages/
-cd @spe/ || mkdir @spe && cd @spe/
+cd packages
+cd @spe || mkdir @spe && cd @spe
 npm publish
 curl ${WX_ROBOT_WEBHOOK} \
 -H 'Content-Type: application/json' \

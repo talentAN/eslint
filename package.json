@@ -9,10 +9,10 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "spe@sensorsdata.com",
-  "license": "ISC",
+  "author": "adam_an02@163.com",
+  "license": "MIT",
   "publishConfig": {
-    "registry": "http://npm.fe.sensorsdata.cn"
+    "registry": "https://registry.npmjs.org/"
   },
   "dependencies": {
     "chalk": "^4.1.0",

@@ -1,6 +1,6 @@
 {
   "name": "@spe/eslint-cli",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "generate custom eslint and prettier config file for all repo",
   "main": "index.js",
   "bin": {

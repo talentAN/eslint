@@ -13,8 +13,7 @@
 
 ```javascript
 // 安装脚手架
-npm install eslint-cli -g
+npm install @talentan/eslint-prettier-cli -g
 // 执行
 eslint-cli init [folder]
-
 ```

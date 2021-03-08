@@ -1,5 +1,4 @@
 /**
- * auth: spe@sensorsdata.com
  *  extend 提供的是 eslint 现有规则的一系列预设
  *  plugin 则提供了除预设之外的自定义规则，当你在 eslint 的规则里找不到合适的的时候就可以借用插件来实现了
  * @format
@@ -45,17 +44,12 @@ const _addPrettierConfig = () => {
   // 设置prettier
   process.argv.ESLINT_CONFIG.extends.push('prettier');
   addDevDependencies('prettier', 'eslint-config-prettier', 'eslint-plugin-prettier');
-  const { useTS } = process.argv.REPO_CONFIG;
-  if (useTS) {
-    process.argv.ESLINT_CONFIG.extends.push('prettier/@typescript-eslint');
-    addDevDependencies('prettier/@typescript-eslint');
-  }
 };
 
 // 生成 .eslintrc.js
 const parseRepoConfig = () => {
   const { useTS } = process.argv.REPO_CONFIG;
-  const parser = useTS ? '@typescript-eslint/parser ' : '@babel/eslint-parser';
+  const parser = useTS ? '@typescript-eslint/parser' : '@babel/eslint-parser';
   addDevDependencies('eslint', parser, ...basicEslint.dependencies);
   process.argv.ESLINT_CONFIG = {
     extends: [],
@@ -64,7 +58,7 @@ const parseRepoConfig = () => {
     env: {
       browser: true,
       es6: true,
-      node: true
+      node: true,
     },
     parserOptions: {
       sourceType: 'module',
@@ -73,15 +67,17 @@ const parseRepoConfig = () => {
       allowImportExportEverywhere: false,
       ecmaFeatures: {
         globalReturn: false,
-        jsx: true
+        jsx: true,
       },
       babelOptions: {
         // parser用了babel的，所以要读取babel配置信息
-        configFile: './babel.config.js'
-      }
-    }
+        configFile: './babel.config.js',
+      },
+    },
   };
   if (useTS) {
+    // 添加TS配置
+    process.argv.ESLINT_CONFIG.parserOptions.project = './tsconfig.json';
     _addTsConfig();
   }
   _addFrameConfig();
@@ -92,5 +88,5 @@ const parseRepoConfig = () => {
 };
 
 module.exports = {
-  parseRepoConfig
+  parseRepoConfig,
 };

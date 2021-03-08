@@ -7,6 +7,7 @@ const prettier = require('prettier');
 const fs = require('fs');
 const path = require('path');
 const { FRAME, PRETTIER_CONFIG } = require('./consts');
+const TS_CONFIG = require('./consts/tsconfig');
 const { parseRepoConfig } = require('./utils');
 const { print } = require('./utils/print');
 const { initContext, writeJson } = require('./utils/fs');
@@ -27,43 +28,43 @@ const _addPreCommit = package => {
     ? 'src/**/*.{js,jsx,ts,tsx}'
     : 'src/**/*.{js,jsx}';
   package['lint-staged'] = {
-    [lintStagedKey]: 'eslint'
+    [lintStagedKey]: 'eslint',
   };
   package.scripts = package.scripts || {};
   package.scripts.lint = `eslint --ext .js src && stylelint \"src/**/*.{css,less}\"`;
   package.husky = {
     hooks: {
-      'pre-commit': 'lint-staged'
-    }
+      'pre-commit': 'lint-staged',
+    },
   };
 };
 
 // 确定项目配置
 const _genModuleConfig = async () => {
   // 是否用TS
-  const { useTS } = await inquirer.prompt({
+  const name = 'Will you use TypeScript in this repo?(no)';
+  const { [name]: useTS } = await inquirer.prompt({
     type: 'confirm',
-    name: 'useTS',
+    name,
     default: false,
-    message: print.warn('Will you use TypeScript in this repo?')
   });
   process.argv.REPO_CONFIG.useTS = useTS;
   // 选择框架
-  const { frame } = await inquirer.prompt({
+  const name_frame = 'Which frame will you use?';
+  const { [name_frame]: frame } = await inquirer.prompt({
     type: 'list',
-    name: 'frame',
+    name: name_frame,
     default: 'React',
     choices: [
       {
         name: `React`,
-        value: FRAME.React
+        value: FRAME.React,
       },
       {
         name: `VueJS`,
-        value: FRAME.VueJS
-      }
+        value: FRAME.VueJS,
+      },
     ],
-    message: print.warn('Which frame will you use?')
   });
   process.argv.REPO_CONFIG.frame = frame;
 };
@@ -96,6 +97,9 @@ const _genConfigFile = folder => {
     path.resolve(folder, 'babel.config.js'),
     prettier.format(`module.exports = ${JSON.stringify(process.argv.BABEL_CONFIG)}`)
   );
+  if (process.argv.REPO_CONFIG.useTS) {
+    writeJson(path.resolve(folder, 'tsconfig.json'), TS_CONFIG);
+  }
   print.info('success to update babel.config.js');
 };
 
@@ -114,18 +118,18 @@ const _modifyPackageJson = folder => {
 
 // 初始化
 const init = async folder => {
-  folder = path.resolve(__dirname, folder);
+  folder = path.resolve(process.cwd(), folder);
   // 初始化相关context
   initContext(folder);
   // 1. 判断业务选择，确定引入内容
   await _genModuleConfig();
   // 2. 删除已存在的eslint, prettier配置文件
   _deleteExistedConfigFile(folder);
-  // 3. 写入新的配置文件
+  // 3. 写入新的配置文件.eslintrc.js, .prettierrc, babel.config.js， (如需要：tsconfig.json)
   _genConfigFile(folder);
   // 4. 添加lint-state and preCommit command, 添加devDependence依赖
   _modifyPackageJson(folder);
-  // 5. 格式化已生成的.eslintrc.js, .prettierrc, babel.config.js
+  // 5. 格式化已生成的.eslintrc.js, .prettierrc, babel.config.js,
   print.success("everything's done, run npm install and enjoy coding with eslint && prettier! ");
 };
 
@@ -134,7 +138,7 @@ const program = new Command().arguments('[folder]').action(async (folder = '.') 
     type: 'confirm',
     name: 'continue',
     default: true,
-    message: print.warn('We will replace your exited .eslintrc.* and .prettierrc.')
+    message: print.warn('We will replace your exited .eslintrc.* and .prettierrc'),
   });
   if (!goOn) {
     return;

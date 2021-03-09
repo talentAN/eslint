@@ -21,21 +21,6 @@
     "inquirer": "^8.0.0",
     "prettier": "^2.2.1"
   },
-  "devDependencies": {
-    "eslint": "latest",
-    "@typescript-eslint/parser": "latest",
-    "@sc/eslint-config-sensorsdata": "latest",
-    "@sc/eslint-config-sensorsdata-typescript": "latest",
-    "@typescript-eslint/eslint-plugin": "latest",
-    "@babel/preset-react": "latest",
-    "@babel/plugin-proposal-class-properties": "latest",
-    "@sc/eslint-config-sensorsdata-react": "latest",
-    "prettier": "latest",
-    "eslint-config-prettier": "latest",
-    "eslint-plugin-prettier": "latest",
-    "lint-staged": "latest",
-    "husky": "latest"
-  },
   "lint-staged": {
     "src/**/*.{js,jsx,ts,tsx}": "eslint"
   },

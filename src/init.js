@@ -28,14 +28,14 @@ const _addPreCommit = package => {
     ? 'src/**/*.{js,jsx,ts,tsx}'
     : 'src/**/*.{js,jsx}';
   package['lint-staged'] = {
-    [lintStagedKey]: 'eslint',
+    [lintStagedKey]: 'eslint'
   };
   package.scripts = package.scripts || {};
   package.scripts.lint = `eslint --ext .js src && stylelint \"src/**/*.{css,less}\"`;
   package.husky = {
     hooks: {
-      'pre-commit': 'lint-staged',
-    },
+      'pre-commit': 'lint-staged'
+    }
   };
 };
 
@@ -46,7 +46,7 @@ const _genModuleConfig = async () => {
   const { [name]: useTS } = await inquirer.prompt({
     type: 'confirm',
     name,
-    default: false,
+    default: false
   });
   process.argv.REPO_CONFIG.useTS = useTS;
   // 选择框架
@@ -58,13 +58,13 @@ const _genModuleConfig = async () => {
     choices: [
       {
         name: `React`,
-        value: FRAME.React,
+        value: FRAME.React
       },
       {
         name: `VueJS`,
-        value: FRAME.VueJS,
-      },
-    ],
+        value: FRAME.VueJS
+      }
+    ]
   });
   process.argv.REPO_CONFIG.frame = frame;
 };
@@ -130,7 +130,9 @@ const init = async folder => {
   // 4. 添加lint-state and preCommit command, 添加devDependence依赖
   _modifyPackageJson(folder);
   // 5. 格式化已生成的.eslintrc.js, .prettierrc, babel.config.js,
-  print.success("everything's done, run npm install and enjoy coding with eslint && prettier! ");
+  print.success(
+    "everything's done, run eslint-cli init [folder] and enjoy coding with eslint && prettier! "
+  );
 };
 
 const program = new Command().arguments('[folder]').action(async (folder = '.') => {
@@ -138,7 +140,7 @@ const program = new Command().arguments('[folder]').action(async (folder = '.') 
     type: 'confirm',
     name: 'continue',
     default: true,
-    message: print.warn('We will replace your exited .eslintrc.* and .prettierrc'),
+    message: print.warn('We will replace your exited .eslintrc.* and .prettierrc')
   });
   if (!goOn) {
     return;
